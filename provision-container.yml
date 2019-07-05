@@ -6,12 +6,12 @@
     image: fedora:27
     container_name: build_container
     image_name: nginx
-    container_engine: buildah  # or docker
+    container_engine: docker  # or docker
   tasks:
   - name: Obtain base image and create a container out of it
-    command: 'buildah from --name {{ container_name }} docker://{{ image }}'
+    command: 'docker from --name {{ container_name }} docker://{{ image }}'
     become: true
-    when: container_engine == 'buildah'
+    when: container_engine == 'docker'
 
   - block:
     - name: Make the base image available locally
@@ -37,10 +37,10 @@
 
   - block:
     - name: Change default command of the container image
-      command: 'buildah config --cmd "nginx -g \"daemon off;\"" {{ container_name }}'
+      command: 'docker config --cmd "nginx -g \"daemon off;\"" {{ container_name }}'
     - name: Commit the container and make it an image
-      command: 'buildah commit --rm {{ container_name }} docker-daemon:{{ image_name }}:latest'
-    when: container_engine == 'buildah'
+      command: 'docker commit --rm {{ container_name }} docker-daemon:{{ image_name }}:latest'
+    when: container_engine == 'docker'
 
   - block:
     - name: Commit the container and make it an image
